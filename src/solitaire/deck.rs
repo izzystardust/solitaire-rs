@@ -1,6 +1,7 @@
 use solitaire::card::*;
 
 use std::cmp;
+use std::iter::range_inclusive;
 
 #[deriving(PartialEq, Show)]
 pub struct Deck {
@@ -17,17 +18,17 @@ impl Deck {
     pub fn new() -> Deck {
         let per_suit = 13;
         let mut deck = Deck { d: Vec::new() };
-        for i in range(0, per_suit) {
-            deck.d.push(Clubs(i+1));
+        for i in range_inclusive(1, per_suit) {
+            deck.d.push(Clubs(i));
         }
-        for i in range(0, per_suit) {
-            deck.d.push(Diamonds(i+1));
+        for i in range_inclusive(1, per_suit) {
+            deck.d.push(Diamonds(i));
         }
-        for i in range(0, per_suit) {
-            deck.d.push(Hearts(i+1));
+        for i in range_inclusive(1, per_suit) {
+            deck.d.push(Hearts(i));
         }
-        for i in range(0, per_suit) {
-            deck.d.push(Spades(i+1));
+        for i in range_inclusive(1, per_suit) {
+            deck.d.push(Spades(i));
         }
         
         deck.d.push(JokerA);
@@ -53,12 +54,10 @@ impl Deck {
     }
 
     pub fn move_joker(&mut self, j: Card, count: int) {
-        let mut i = index_of(self.d.as_slice(), j).unwrap();
+        let mut i = self.d.as_slice().position_elem(&j).unwrap();
         for _ in range(0i, count) {
             if i < self.d.len()-1 {
-                let temp = self.d[i];
-                *self.d.get_mut(i) = self.d[i+1];
-                *self.d.get_mut(i+1) = temp;
+                self.d.as_mut_slice().swap(i, i+1);
             } else {
                 // if card is the last card in the deck, move below the first card of the deck
                 // every card needs to be moved... maybe this should have been a linked list
@@ -78,8 +77,8 @@ impl Deck {
 
     pub fn triple_cut(&mut self) {
         let mut new = Vec::with_capacity(self.d.len());
-        let ai = index_of(self.d.as_slice(), JokerA).unwrap();
-        let bi = index_of(self.d.as_slice(), JokerB).unwrap();
+        let ai = self.d.as_slice().position_elem(&JokerA).unwrap();
+        let bi = self.d.as_slice().position_elem(&JokerB).unwrap();
         let first = cmp::min(ai, bi);
         let secnd = cmp::max(ai, bi);
         new.push_all(self.d.slice(secnd+1, self.d.len()));
@@ -101,13 +100,6 @@ impl Deck {
         self.d = new;
     }
     
-}
-
-fn index_of<T: PartialEq>(a: &[T], x: T) -> Option<uint> {
-    match a.iter().enumerate().find(|&(_, q)| *q == x) {
-        Some((i, _)) => Some(i),
-        None => None,
-    }
 }
 
 #[test]
