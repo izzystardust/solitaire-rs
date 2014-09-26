@@ -1,5 +1,6 @@
 use solitaire::card::*;
 
+use std::char;
 use std::cmp;
 use std::iter::range_inclusive;
 
@@ -34,6 +35,14 @@ impl Deck {
         deck.d.push(JokerA);
         deck.d.push(JokerB);
         return deck;
+    }
+
+    pub fn encrypt(&mut self, plain: &str) -> String {
+        plain.chars().map(|x|
+                          match char::is_alphabetic(x) {
+                              true => (((x as u8 - 63 + self.gen_keystream_letter() as u8) % 26) + 63) as char,
+                              false => x,
+                          }).collect::<String>()
     }
 
     pub fn gen_keystream_letter(&mut self) -> uint {
@@ -139,6 +148,8 @@ fn triple_cut() {
 #[test]
 fn gen_keystream_letter() {
     let mut d = Deck::new();
-
-    assert_eq!(d.gen_keystream_letter(), 4);
+    let expects = vec![4, 49, 10, 24, 8, 51, 44, 6, 4, 33];
+    for e in expects.iter() {
+        assert_eq!(d.gen_keystream_letter(), *e);
+    }
 }
