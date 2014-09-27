@@ -1,10 +1,10 @@
-use solitaire::card::*;
+use card::*;
 
 use std::char;
 use std::cmp;
 use std::iter::range_inclusive;
 
-#[deriving(PartialEq, Show)]
+#[deriving(Clone, PartialEq, Show)]
 pub struct Deck {
     pub d: Vec<Card>,
 }
@@ -69,7 +69,16 @@ impl Deck {
                           match char::is_alphabetic(x) {
                               true => (((x as u8 - a + self.gen_keystream_letter() as u8) % 26) + a) as char,
                               false => x,
-                          }).collect::<String>()
+                          }).collect()
+    }
+
+    pub fn decrypt(&mut self, cipher: &str) -> String {
+        let a = 'A' as u8;
+        cipher.chars().map(|x|
+                           match char::is_alphabetic(x) {
+                               true => (((x as u8 +26 - a - self.gen_keystream_letter() as u8) %26) + a) as char,
+                               false => x,
+                           }).collect()
     }
 
     pub fn gen_keystream_letter(&mut self) -> uint {
@@ -209,5 +218,17 @@ fn encrypt() {
         let mut d = Deck::with_key(key);
         let out = d.encrypt(plain);
         assert_eq!(out.as_slice(), cipher);
+    }
+}
+
+#[test]
+fn decrypt() {
+    let tests = [
+        ("", "AAAAAAAAAAAAAAA"),
+        ];
+    for &(key, plain) in tests.iter() {
+        let mut d1 = Deck::with_key(key);
+        let mut d2 = Deck::with_key(key);
+        assert_eq!(d2.decrypt(d1.encrypt(plain).as_slice()).as_slice(), plain);
     }
 }

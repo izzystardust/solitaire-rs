@@ -1,10 +1,10 @@
 #![feature(globs)]
 
-mod solitaire;
+extern crate solitaire;
 
 fn main() {
     let message = "AAAAA AAAAA";
-    let mut d = solitaire::Deck::new();
+    let mut d = solitaire::Deck::with_key("FOO");
     let y = d.encrypt(message);
     println!("{}", y);
 }

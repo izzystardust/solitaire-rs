@@ -1,3 +1,4 @@
+#![feature(globs)]
 pub use self::deck::*;
 pub use self::card::*;
 
