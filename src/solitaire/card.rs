@@ -19,23 +19,6 @@ impl Card {
             JokerB => 53,
         }
     }
-
-    //    pub fn is_joker(&self) -> bool {
-    //     match *self {
-    //         JokerA => true,
-    //         JokerB => true,
-    //         _ => false,
-    //     }
-    // }
-
-    // pub fn is_red(&self) -> bool {
-    //     match *self {
-    //         Diamonds(_) => true,
-    //         Hearts(_) => true,
-    //         _ => false,
-    //     }
-    // }
-    
 }
 
 #[test]
