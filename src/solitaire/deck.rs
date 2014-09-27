@@ -37,6 +37,32 @@ impl Deck {
         return deck;
     }
 
+    pub fn with_key(key: &str) -> Deck {
+        let mut deck = Deck::new();
+        let a = 'A' as uint - 1;
+        let k = key.chars()
+                   .filter(|x| char::is_alphabetic(*x))
+                   .map(|x| char::to_uppercase(x))
+                   .collect::<String>();
+        for e in k.as_bytes().iter() {
+            deck.with_key_helper(*e as uint - a);
+        }
+            
+        return deck;
+    }
+
+    fn with_key_helper(&mut self, i: uint) {
+        self.move_joker(JokerA, 1);
+        self.move_joker(JokerB, 2);
+        self.triple_cut();
+        self.count_cut();
+        let mut new = Vec::with_capacity(self.d.len());
+        new.push_all(self.d.slice(i, self.d.len()-1));
+        new.push_all(self.d.slice(0, i));
+        new.push(*self.d.last().unwrap());
+        self.d = new;
+    }
+    
     pub fn encrypt(&mut self, plain: &str) -> String {
         let a = 'A' as u8;
         plain.chars().map(|x|
@@ -150,6 +176,23 @@ fn triple_cut() {
 fn gen_keystream_letter() {
     let mut d = Deck::new();
     let expects = vec![4, 49, 10, 24, 8, 51, 44, 6, 4, 33];
+    for e in expects.iter() {
+        assert_eq!(d.gen_keystream_letter(), *e);
+    }
+}
+
+#[test]
+fn count_cut() {
+    let mut d = Deck{ d: vec![Clubs(7), Clubs(3), Clubs(13), Clubs(14), Clubs(15), Clubs(16), Clubs(17), Clubs(18), Clubs(4), Clubs(5), Clubs(8), Clubs(9)]};
+    let expect = Deck{ d: vec![Clubs(5), Clubs(8), Clubs(7), Clubs(3), Clubs(13), Clubs(14), Clubs(15), Clubs(16), Clubs(17), Clubs(18), Clubs(4), Clubs(9)] };
+    d.count_cut();
+    assert_eq!(d, expect);
+}
+
+#[test]
+fn key() {
+    let mut d = Deck::with_key("FOO");
+    let expects = vec![8, 19, 7, 25, 20, 9, 8, 22, 32, 43, 5, 26, 17, 38, 48];
     for e in expects.iter() {
         assert_eq!(d.gen_keystream_letter(), *e);
     }
