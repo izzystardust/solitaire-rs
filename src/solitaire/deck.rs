@@ -189,3 +189,25 @@ fn key() {
         assert_eq!(d.gen_keystream_letter(), *e);
     }
 }
+
+#[test]
+fn encrypt() {
+    let tests = vec![
+        ("", "AAAAAAAAAAAAAAA", "EXKYIZSGEHUNTIQ"),
+        ("F", "AAAAAAAAAAAAAAA", "XYIUQBMHKKJBEGY"),
+        ("FO", "AAAAAAAAAAAAAAA", "TUJYMBERLGXNDIW"),
+        ("FOO", "AAAAAAAAAAAAAAA", "ITHZUJIWGRFARMW"),
+        ("A", "AAAAAAAAAAAAAAA", "XODALGSCULIQNSC"),
+        ("aa", "AAAAAAAAAAAAAAA", "OHGWMXXCAIMCIQP"),
+        ("aaa", "AAAAAAAAAAAAAAA", "DCSQYHBQZNGDRUT"),
+        ("b", "AAAAAAAAAAAAAAA", "XQEEMOITLZVDSQS"),
+        ("bc", "AAAAAAAAAAAAAAA", "QNGRKQIHCLGWSCE"),
+        ("bcd", "AAAAAAAAAAAAAAA", "FMUBYBMAXHNQXCJ"),
+        ("cryptonomicon", "AAAAAAAAAAAAAAAAAAAAAAAAA", "SUGSRSXSWQRMXOHIPBFPXARYQ"),
+        ];
+    for &(key, plain, cipher) in tests.iter() {
+        let mut d = Deck::with_key(key);
+        let out = d.encrypt(plain);
+        assert_eq!(out.as_slice(), cipher);
+    }
+}
