@@ -76,16 +76,11 @@ impl Deck {
         self.move_joker(JokerA, 1);
         self.move_joker(JokerB, 2);
         self.triple_cut();
-        let i = self.d.last().unwrap().count_index();
-        self.count_cut(i);
+        self.count_cut();
         let i = self.d[0].count_index();
-        let output_card = self.d[i];
-        match output_card {
-            Clubs(i) => i,
-            Diamonds(i) => i + 13,
-            Hearts(i) => i,
-            Spades(i) => i + 13,
-            _ => self.gen_keystream_letter(),
+        match self.d[i].count_index() {
+            53 => self.gen_keystream_letter(),
+            i => i,
         }
     }
 
@@ -123,19 +118,16 @@ impl Deck {
         self.d = new;
     }
 
-    pub fn count_cut(&mut self, c: uint) {
+    pub fn count_cut(&mut self) {
         // cut after c
+        let i = self.d.last().unwrap().count_index();
         let mut new = Vec::with_capacity(self.d.len());
-        for i in range(c, self.d.len()) {
-            new.push(self.d[i]);
-        }
-
-        for i in range(0, c) {
-            new.push(self.d[i]);
-        }
+        new.push_all(self.d.slice(i, self.d.len()-1));
+        new.push_all(self.d.slice(0, i));
+        new.push(*self.d.last().unwrap());
         self.d = new;
     }
-    
+
 }
 
 #[test]
