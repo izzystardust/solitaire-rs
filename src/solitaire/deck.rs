@@ -38,9 +38,10 @@ impl Deck {
     }
 
     pub fn encrypt(&mut self, plain: &str) -> String {
+        let a = 'A' as u8;
         plain.chars().map(|x|
                           match char::is_alphabetic(x) {
-                              true => (((x as u8 - 63 + self.gen_keystream_letter() as u8) % 26) + 63) as char,
+                              true => (((x as u8 - a + self.gen_keystream_letter() as u8) % 26) + a) as char,
                               false => x,
                           }).collect::<String>()
     }
